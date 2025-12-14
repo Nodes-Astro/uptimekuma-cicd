@@ -17,13 +17,16 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "${{ secrets.PROD_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create remote directory
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "mkdir -p ${{ secrets.PROD_PATH }}"
 
       - name: Upload compose files
         run: |
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no uptimekuma-cicd/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_DIR }}/docker-compose.yml
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no uptimekuma-cicd/Caddyfile          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_DIR }}/Caddyfile
-
+          scp -i ~/.ssh/id_rsa uptimekuma-cicd/docker-compose.yml ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.PROD_PATH }}/docker-compose.yml
+          scp -i ~/.ssh/id_rsa uptimekuma-cicd/Caddyfile          ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.PROD_PATH }}/Caddyfile
 
       - name: Remote deploy (docker compose)
         run: |
