@@ -33,7 +33,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
             set -e
             cd "${{ secrets.PROD_PATH }}"
-            docker compose pull
-            docker compose up -d
+            docker-compose pull
+            docker-compose up -d
             docker image prune -f
           EOF
