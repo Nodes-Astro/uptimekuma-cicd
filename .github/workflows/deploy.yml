@@ -21,8 +21,9 @@ jobs:
 
       - name: Upload compose files
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "mkdir -p '${{ secrets.PROD_PATH }}'"
-          scp -i ~/.ssh/id_rsa docker-compose.yml Caddyfile ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.PROD_PATH }}/
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no uptimekuma-cicd/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_DIR }}/docker-compose.yml
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no uptimekuma-cicd/Caddyfile          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_DIR }}/Caddyfile
+
 
       - name: Remote deploy (docker compose)
         run: |
