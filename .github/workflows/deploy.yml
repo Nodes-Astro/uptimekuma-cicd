@@ -1,0 +1,35 @@
+name: Deploy (Production)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.PROD_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Upload compose files
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "mkdir -p '${{ secrets.PROD_PATH }}'"
+          scp -i ~/.ssh/id_rsa docker-compose.yml Caddyfile ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.PROD_PATH }}/
+
+      - name: Remote deploy (docker compose)
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
+            set -e
+            cd "${{ secrets.PROD_PATH }}"
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
+          EOF

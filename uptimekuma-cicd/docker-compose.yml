@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    volumes:
+      - uptimekuma_data:/app/data
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - uptime-kuma
+    restart: unless-stopped
+
+volumes:
+  uptimekuma_data:
+  caddy_data:
+  caddy_config:
