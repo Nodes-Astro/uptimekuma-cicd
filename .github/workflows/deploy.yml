@@ -28,7 +28,7 @@ jobs:
           scp -i ~/.ssh/id_rsa uptimekuma-cicd/docker-compose.yml ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.PROD_PATH }}/docker-compose.yml
           scp -i ~/.ssh/id_rsa uptimekuma-cicd/Caddyfile          ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.PROD_PATH }}/Caddyfile
 
-      - name: Remote deploy (docker compose)
+      - name: Remote deploy (docker-compose)
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
             set -e
@@ -37,3 +37,4 @@ jobs:
             docker-compose up -d
             docker image prune -f
           EOF
+
